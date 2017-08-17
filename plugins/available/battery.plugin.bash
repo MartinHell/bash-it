@@ -2,9 +2,17 @@ cite about-plugin
 about-plugin 'display info about your battery charge level'
 
 ac_adapter_connected(){
-  if command_exists acpi;
+  if command_exists upower;
+  then
+    upower -i $(upower -e | grep BAT) | grep 'state' | grep -q 'charging\|fully-charged'
+    return $?
+  elif command_exists acpi;
   then
     acpi -a | grep -q "on-line"
+    return $?
+  elif command_exists pmset;
+  then
+    pmset -g batt | grep -q 'AC Power'
     return $?
   elif command_exists ioreg;
   then
@@ -18,9 +26,17 @@ ac_adapter_connected(){
 }
 
 ac_adapter_disconnected(){
-  if command_exists acpi;
+  if command_exists upower;
+  then
+    upower -i $(upower -e | grep BAT) | grep 'state' | grep -q 'discharging'
+    return $?
+  elif command_exists acpi;
   then
     acpi -a | grep -q "off-line"
+    return $?
+  elif command_exists pmset;
+  then
+    pmset -g batt | grep -q 'Battery Power'
     return $?
   elif command_exists ioreg;
   then
@@ -37,7 +53,11 @@ battery_percentage(){
   about 'displays battery charge as a percentage of full (100%)'
   group 'battery'
   
-  if command_exists acpi;
+  if command_exists upower;
+  then
+    local UPOWER_OUTPUT=$(upower --show-info $(upower --enumerate | grep BAT) | grep percentage | tail --bytes 5)
+    echo ${UPOWER_OUTPUT: : -1}
+  elif command_exists acpi;
   then
     local ACPI_OUTPUT=$(acpi -b)
     case $ACPI_OUTPUT in
@@ -62,6 +82,17 @@ battery_percentage(){
       ;;
       *)
         echo '-1'
+      ;;
+    esac
+  elif command_exists pmset;
+  then
+    local PMSET_OUTPUT=$(pmset -g ps | sed -n 's/.*[[:blank:]]+*\(.*%\).*/\1/p')
+    case $PMSET_OUTPUT in
+      100*)
+        echo '100'
+      ;;
+      *)
+        echo $PMSET_OUTPUT | head -c 2
       ;;
     esac
   elif command_exists ioreg;
