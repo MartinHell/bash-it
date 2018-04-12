@@ -25,9 +25,9 @@ function prompt_command() {
     #PS1="${bold_cyan}$(scm_char)${green}$(scm_prompt_info)${purple}$(ruby_version_prompt) ${yellow}\h ${reset_color}in ${green}\w ${reset_color}\n${green}→${reset_color} "
 if [ $(id -u) -eq 0 ];
 then
-    PS1="\n$(battery_char) $(__bobby_clock)${yellow}$(ruby_version_prompt) ${bold_red}\u${reset_color}@${purple}\h ${reset_color}in ${green}\w\n${bold_cyan}$(scm_prompt_char_info) ${green}→${reset_color} "
+    PS1="\n$(battery_char) $(__bobby_clock)${yellow}$(ruby_version_prompt) ${bold_red}\u${reset_color}@${purple}\h ${reset_color}in ${green}\w\n${bold_cyan}$(scm_prompt_char_info) ${purple}$(get_os_project) ${green}→${reset_color} "
 else
-    PS1="\n$(battery_char) $(__bobby_clock)${yellow}$(ruby_version_prompt) ${bold_cyan}\u${reset_color}@${purple}\h ${reset_color}in ${green}\w\n${bold_cyan}$(scm_prompt_char_info) ${green}→${reset_color} "
+    PS1="\n$(battery_char) $(__bobby_clock)${yellow}$(ruby_version_prompt) ${bold_cyan}\u${reset_color}@${purple}\h ${reset_color}in ${green}\w\n${bold_cyan}$(scm_prompt_char_info) ${green}$(get_os_project) ${green}→${reset_color} "
 fi
 }
 
